@@ -1,19 +1,17 @@
 package DesignCache;
 
 /**
- * Created by jindong on 10/5/17.
- * The LRU Cache Strategy relevant to put, evict and rank {@link CacheEntry} in {@link CacheEntryList} and {@link CacheIndex}
+ * Created by jindong on 10/9/17.
+ * LRC (Least Recent Created) eviction strategy, as an example how to create your own eviction strategy.
  */
-public class LRUCacheStrategy<K, V> implements CacheStrategy<K, V> {
+public class LRCCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void postGet(CacheEntryList<K, V> cacheEntryList, CacheEntry<K, V> target) {
-        cacheEntryList.removeEntry(target);
-        // move current to tail
-        cacheEntryList.appendEntry(target);
+        // Do nothing for LRC.
     }
 
     /**

@@ -1,13 +1,15 @@
 package DesignCache;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jindong on 10/5/17.
+ * The ConcurrentHashMap of {@link CacheEntry} with the key of the CacheEntry as the key, and the CacheEntry as the value, tread safe
  */
 public class CacheIndex<K, V> {
 
-    private HashMap<K, CacheEntry<K, V>> cacheEntryHashMap = new HashMap<>();
+    private Map<K, CacheEntry<K, V>> cacheEntryHashMap = new ConcurrentHashMap<>();
 
     public CacheEntry<K, V> getEntry(K key) {
         return cacheEntryHashMap.get(key);

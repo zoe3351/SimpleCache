@@ -4,22 +4,34 @@ package DesignCache;
  * Created by jindong on 10/4/17.
  */
 public class CacheFactory {
-    public static <K, V> Cache<K, V> createLRUCache(int capacity) {
-        return new LRUCache<>(capacity);
+
+    /**
+     * Create 4-way associative cache of corresponding data type using LRU cache strategy as default
+     * @param capacity the total size of the cache
+     * @return Cache with default LRU cache strategy
+     */
+    public static <K, V> Cache<K, V> createCache(int capacity) {
+        return new Cache<>(new LRUCacheStrategy<K, V>(), capacity, 4);
     }
 
-    public static <K, V> Cache<K, V> createMRUCache(int capacity) {
-        return new MRUCache<>(capacity);
+    /**
+     * Create cache of corresponding data type using LRU cache strategy as default
+     * @param capacity the total size of the cache
+     * @param associativity the associativity of the cache i.e. the size of each cache bucket
+     * @return Cache with default LRU cache strategy
+     */
+    public static <K, V> Cache<K, V> createCache(int capacity, int associativity) {
+        return new Cache<>(new LRUCacheStrategy<K, V>(), capacity, associativity);
     }
 
-    public static <K, V> Cache<K, V> createCache(int capacity, CacheStrategy<K, V> cacheStrategy) {
-        return new Cache<>(cacheStrategy, capacity);
+    /**
+     * Create cache of corresponding data type using particular cache strategy
+     * @param cacheStrategy the strategy of cache i.e. LRU, MRU
+     * @param capacity the total size of the cache
+     * @param associativity the associativity of the cache i.e. the size of each cache bucket
+     * @return Cache
+     */
+    public static <K, V> Cache<K, V> createCache(CacheStrategy<K, V> cacheStrategy, int capacity, int associativity) {
+        return new Cache<>(cacheStrategy, capacity, associativity);
     }
 }
-
-//public class CacheFactory {
-//    public static Cache create(int capacity) {
-//        Cache cache = new Cache(capacity);
-//        return cache;
-//    }
-//}

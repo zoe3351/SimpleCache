@@ -1,64 +1,70 @@
 package DesignCache;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * Created by jindong on 10/4/17.
+ * Created by jindong on 10/6/17.
+ * The central role to manipulate in-memory N-Way Set-Associative cache
+ * Able to store any arbitrary data types
+ *
  */
-
 public class Cache<K, V> {
+    private int associativity;
+    private int size;
+    private CacheBucket<K, V>[] cacheBuckets;
 
-    int capacity;
-    CacheIndex<K, V> cacheIndex = new CacheIndex<>();
-    CacheEntryList<K, V> cacheEntryList = new CacheEntryList<>();
-
-    private CacheStrategy<K, V> strategy;
-
-    public Cache(CacheStrategy strategy, int capacity) {
-        this.strategy = strategy;
-        this.capacity = capacity;
+    public Cache(CacheStrategy<K, V> strategy, int size) {
+        this(strategy, size, 4);
     }
 
+    public Cache(CacheStrategy<K, V> strategy, int size, int associativity) {
+        if (associativity > 0 && size > 0 && size % associativity == 0) {
+            this.size = size;
+            this.associativity = associativity;
+
+            cacheBuckets = new CacheBucket[getSetNum()];
+
+            for (int i = 0; i < getSetNum(); i++) {
+                cacheBuckets[i] = new CacheBucket<>(strategy, associativity);
+            }
+        } else {
+            throw new IllegalArgumentException(String.format("Illegal cache size %d, cache associativity %d.", size, associativity));
+        }
+    }
+
+    /**
+     * Get the record from cache using the key
+     * @param key the key to get the record from cache
+     * @return value the value associated with the given key. null if key not exists
+     */
     public V get(K key) {
-        if(cacheIndex.getEntry(key) == null) {
-            return null;
-        }
-
-        CacheEntry<K, V> target = cacheIndex.getEntry(key);
-        strategy.postGet(cacheEntryList, target);
-        return target.value;
+        int hashCode = key.hashCode();
+        return cacheBuckets[hashCode % getSetNum()].get(key);
     }
 
+    /**
+     * Put key-value entry into the cache
+     * @param key
+     * @param value
+     */
     public void put(K key, V value) {
-        // this internal `get` method will update the key's position in the linked list.
-        if (get(key) != null) {
-            cacheIndex.getEntry(key).value = value;
-            return;
-        }
-
-        if (cacheIndex.getSize() == capacity) {
-            strategy.evict(cacheIndex, cacheEntryList);
-        }
-
-        CacheEntry<K, V> newEntry = new CacheEntry<>(key, value);
-        strategy.doPut(cacheIndex, cacheEntryList, newEntry);
+        int hashCode = key.hashCode();
+        cacheBuckets[hashCode % getSetNum()].put(key, value);
     }
 
-    public int size() {
-        return cacheIndex.getSize();
+    private int getSetNum() {
+        return this.size / this.associativity;
     }
 
-    public void remove(K key) {
-        CacheEntry cahceEntry = cacheIndex.getEntry(key);
-        if (cahceEntry != null) {
-            cahceEntry.prev.next = cahceEntry.next;
-            cacheIndex.removeEntry(key);
+    @Override
+    public String toString() {
+        List<String> res = new ArrayList<>();
+        for (CacheBucket<K, V> cacheBucket : cacheBuckets) {
+            res.add(cacheBucket.toString());
         }
+        return Arrays.toString(res.toArray());
     }
 
-//    public void clear() {
-//        this.hs.clear();
-//        this.head.next = this.tail;
-//        this.tail.prev = this.head;
-//    }
 }
