@@ -40,10 +40,7 @@ public class Cache<K, V> {
      * @return value the value associated with the given key. null if key not exists
      */
     public V get(K key) {
-        int bucketId = key.hashCode() % getSetNum();
-        if (bucketId < 0) {
-            bucketId += getSetNum();
-        }
+        int bucketId = getBucketId(key);
         return cacheBuckets[bucketId].get(key);
     }
 
@@ -53,8 +50,12 @@ public class Cache<K, V> {
      * @param value
      */
     public void put(K key, V value) {
-        int bucketId = key.hashCode() % getSetNum();
+        int bucketId = getBucketId(key);
         cacheBuckets[bucketId].put(key, value);
+    }
+
+    private int getBucketId(K key){
+        return Math.abs(key.hashCode() % getSetNum());
     }
 
     private int getSetNum() {
