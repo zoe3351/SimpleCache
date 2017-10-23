@@ -10,9 +10,9 @@ public class CacheBucket<K, V> {
 
     private int capacity;
     private CacheIndex<K, V> cacheIndex = new CacheIndex<>();
-    private CacheEntryList<K, V> cacheEntryList = new CacheEntryList<>();
+    // private CacheEntryList<K, V> cacheEntryList = new CacheEntryList<>();
 
-    private CacheStrategy<K, V> strategy;
+    private CacheStrategy<K> strategy;
 
     public CacheBucket(CacheStrategy strategy, int capacity) {
         this.strategy = strategy;
@@ -30,9 +30,9 @@ public class CacheBucket<K, V> {
         }
 
         synchronized (this) {
-            CacheEntry<K, V> target = cacheIndex.getEntry(key);
-            strategy.postGet(cacheEntryList, target);
-            return target.value;
+            V value = cacheIndex.getEntry(key);
+            strategy.onGet(key);
+            return value;
         }
     }
 
@@ -44,24 +44,20 @@ public class CacheBucket<K, V> {
     public synchronized void put(K key, V value) {
         // this internal `get` method will update the key's position in the linked list.
         if (get(key) != null) {
-            cacheIndex.getEntry(key).value = value;
+            cacheIndex.putEntry(key, value);
             return;
         }
 
         if (cacheIndex.getSize() == capacity) {
-            strategy.evict(cacheIndex, cacheEntryList);
+            K keyToEvict = strategy.evict();
+            cacheIndex.removeEntry(keyToEvict);
         }
 
-        CacheEntry<K, V> newEntry = new CacheEntry<>(key, value);
-        strategy.doPut(cacheIndex, cacheEntryList, newEntry);
+        cacheIndex.putEntry(key, value);
+        strategy.onPut(key);
     }
 
     public int size() {
         return cacheIndex.getSize();
-    }
-
-    @Override
-    public String toString() {
-        return cacheEntryList.toString();
     }
 }

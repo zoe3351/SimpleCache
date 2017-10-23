@@ -11,7 +11,7 @@ public class CacheFactory {
      * @return Cache with default LRU cache strategy
      */
     public static <K, V> Cache<K, V> createCache(int capacity) {
-        return new Cache<>(new LRUCacheStrategy<K, V>(), capacity, 4);
+        return new Cache<>(new LRUCacheStrategy<K>(), capacity, 4);
     }
 
     /**
@@ -21,7 +21,7 @@ public class CacheFactory {
      * @return Cache with default LRU cache strategy
      */
     public static <K, V> Cache<K, V> createCache(int capacity, int associativity) {
-        return new Cache<>(new LRUCacheStrategy<K, V>(), capacity, associativity);
+        return new Cache<>(new LRUCacheStrategy<K>(), capacity, associativity);
     }
 
     /**
@@ -31,7 +31,7 @@ public class CacheFactory {
      * @param associativity the associativity of the cache i.e. the size of each cache bucket
      * @return Cache
      */
-    public static <K, V> Cache<K, V> createCache(CacheStrategy<K, V> cacheStrategy, int capacity, int associativity) {
+    public static <K, V> Cache<K, V> createCache(CacheStrategy<K> cacheStrategy, int capacity, int associativity) {
         return new Cache<>(cacheStrategy, capacity, associativity);
     }
 }

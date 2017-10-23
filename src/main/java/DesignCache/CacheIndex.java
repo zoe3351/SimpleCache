@@ -9,14 +9,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheIndex<K, V> {
 
-    private Map<K, CacheEntry<K, V>> cacheEntryHashMap = new ConcurrentHashMap<>();
+    private Map<K, V> cacheEntryHashMap = new ConcurrentHashMap<>();
 
-    public CacheEntry<K, V> getEntry(K key) {
+    public V getEntry(K key) {
         return cacheEntryHashMap.get(key);
     }
 
-    public void putEntry(K key, CacheEntry cacheEntry) {
-        cacheEntryHashMap.put(key, cacheEntry);
+    public void putEntry(K key, V value) {
+        cacheEntryHashMap.put(key, value);
     }
 
     public void removeEntry(K key) {

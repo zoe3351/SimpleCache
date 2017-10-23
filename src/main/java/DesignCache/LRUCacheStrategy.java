@@ -4,26 +4,30 @@ package DesignCache;
  * Created by jindong on 10/5/17.
  * The LRU Cache Strategy relevant to put, evict and rank {@link CacheEntry} in {@link CacheEntryList} and {@link CacheIndex}
  */
-public class LRUCacheStrategy<K, V> implements CacheStrategy<K, V> {
+public class LRUCacheStrategy<K> implements CacheStrategy<K> {
+
+    private CacheIndex<K, CacheKeyEntry<K>> cacheKeyMap = new CacheIndex<>();
+    private CacheKeyList<K> cacheKeyList = new CacheKeyList<>();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void postGet(CacheEntryList<K, V> cacheEntryList, CacheEntry<K, V> target) {
-        cacheEntryList.removeEntry(target);
+    public void onGet(K key) {
+        CacheKeyEntry<K> target = cacheKeyMap.getEntry(key);
+        cacheKeyList.removeKey(target);
         // move current to tail
-        cacheEntryList.appendEntry(target);
+        cacheKeyList.appendKey(target);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public K evict(CacheIndex<K, V> cacheIndex, CacheEntryList<K, V> cacheEntryList) {
+    public K evict() {
         // evict entry from head
-        K keyEvicted = cacheEntryList.evictHead();
-        cacheIndex.removeEntry(keyEvicted);
+        K keyEvicted = cacheKeyList.evictHead();
+        cacheKeyMap.removeEntry(keyEvicted);
         return keyEvicted;
     }
 
@@ -31,9 +35,10 @@ public class LRUCacheStrategy<K, V> implements CacheStrategy<K, V> {
      * {@inheritDoc}
      */
     @Override
-    public void doPut(CacheIndex<K, V> cacheIndex, CacheEntryList<K, V> cacheEntryList, CacheEntry<K, V> entry) {
-        cacheIndex.putEntry(entry.key, entry);
+    public void onPut(K key) {
+        CacheKeyEntry<K> newEntry = new CacheKeyEntry<>(key);
+        cacheKeyMap.putEntry(key, newEntry);
         // prepend entry to tail
-        cacheEntryList.appendEntry(entry);
+        cacheKeyList.appendKey(newEntry);
     }
 }

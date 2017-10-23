@@ -36,43 +36,30 @@ public class AppTest
 
     public static void testLRUCache() {
 
-        Cache<Integer, Integer> lruCache = CacheFactory.createCache(new LRUCacheStrategy<Integer, Integer>(), 3, 3);
+        Cache<String, String> lruCache = CacheFactory.createCache(new LRUCacheStrategy<String>(), 3, 3);
 
-        lruCache.put(1, 22);
-        System.out.println(lruCache);
-        lruCache.put(2, 23);
-        System.out.println(lruCache);
-        lruCache.put(3, 27);
-        System.out.println(lruCache);
-        lruCache.put(4, 29);
-        System.out.println(lruCache);
-        lruCache.put(5, 28);
-        System.out.println(lruCache);
-        lruCache.put(6, 21);
-        System.out.println(lruCache);
-        lruCache.put(7, 24);
-        System.out.println(lruCache);
+        lruCache.put("random", "mache");
+        lruCache.put("string", "23");
+        lruCache.put("else", "345");
+        lruCache.put("what", "sdf");
+        lruCache.put("make", "45");
+        lruCache.put("dela", "21");
+        lruCache.put("random", "24");
 
-        assertNull(lruCache.get(4));
-        assertEquals(lruCache.get(7).intValue(), 24);
+        assertNull(lruCache.get("what"));
+        assertEquals(lruCache.get("random"), "24");
     }
 
     public static void testMRUCache() {
 
-        Cache<Integer, Integer> mruCache = CacheFactory.createCache(new MRUCacheStrategy<Integer, Integer>(), 3, 3);
+        Cache<Integer, Integer> mruCache = CacheFactory.createCache(new MRUCacheStrategy<Integer>(), 3, 3);
 
         mruCache.put(1, 22);
-        System.out.println(mruCache);
         mruCache.put(2, 23);
-        System.out.println(mruCache);
         mruCache.put(3, 27);
-        System.out.println(mruCache);
         mruCache.put(4, 29);
-        System.out.println(mruCache);
         mruCache.put(5, 28);
-        System.out.println(mruCache);
         mruCache.put(6, 21);
-        System.out.println(mruCache);
         mruCache.put(7, 24);
 
         assertEquals(mruCache.get(1).intValue(), 22);

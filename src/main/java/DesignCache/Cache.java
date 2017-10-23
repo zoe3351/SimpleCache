@@ -15,11 +15,11 @@ public class Cache<K, V> {
     private int size;
     private CacheBucket<K, V>[] cacheBuckets;
 
-    public Cache(CacheStrategy<K, V> strategy, int size) {
+    public Cache(CacheStrategy<K> strategy, int size) {
         this(strategy, size, 4);
     }
 
-    public Cache(CacheStrategy<K, V> strategy, int size, int associativity) {
+    public Cache(CacheStrategy<K> strategy, int size, int associativity) {
         if (associativity > 0 && size > 0 && size % associativity == 0) {
             this.size = size;
             this.associativity = associativity;
@@ -40,8 +40,11 @@ public class Cache<K, V> {
      * @return value the value associated with the given key. null if key not exists
      */
     public V get(K key) {
-        int hashCode = key.hashCode();
-        return cacheBuckets[hashCode % getSetNum()].get(key);
+        int bucketId = key.hashCode() % getSetNum();
+        if (bucketId < 0) {
+            bucketId += getSetNum();
+        }
+        return cacheBuckets[bucketId].get(key);
     }
 
     /**
@@ -50,8 +53,8 @@ public class Cache<K, V> {
      * @param value
      */
     public void put(K key, V value) {
-        int hashCode = key.hashCode();
-        cacheBuckets[hashCode % getSetNum()].put(key, value);
+        int bucketId = key.hashCode() % getSetNum();
+        cacheBuckets[bucketId].put(key, value);
     }
 
     private int getSetNum() {

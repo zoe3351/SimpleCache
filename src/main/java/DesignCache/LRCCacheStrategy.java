@@ -4,13 +4,15 @@ package DesignCache;
  * Created by jindong on 10/9/17.
  * LRC (Least Recent Created) eviction strategy, as an example how to create your own eviction strategy.
  */
-public class LRCCacheStrategy<K, V> implements CacheStrategy<K, V> {
+public class LRCCacheStrategy<K> implements CacheStrategy<K> {
+
+    private CacheKeyList<K> cacheKeyList = new CacheKeyList<>();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void postGet(CacheEntryList<K, V> cacheEntryList, CacheEntry<K, V> target) {
+    public void onGet(K key) {
         // Do nothing for LRC.
     }
 
@@ -18,10 +20,9 @@ public class LRCCacheStrategy<K, V> implements CacheStrategy<K, V> {
      * {@inheritDoc}
      */
     @Override
-    public K evict(CacheIndex<K, V> cacheIndex, CacheEntryList<K, V> cacheEntryList) {
+    public K evict() {
         // evict entry from head
-        K keyEvicted = cacheEntryList.evictHead();
-        cacheIndex.removeEntry(keyEvicted);
+        K keyEvicted = cacheKeyList.evictHead();
         return keyEvicted;
     }
 
@@ -29,9 +30,9 @@ public class LRCCacheStrategy<K, V> implements CacheStrategy<K, V> {
      * {@inheritDoc}
      */
     @Override
-    public void doPut(CacheIndex<K, V> cacheIndex, CacheEntryList<K, V> cacheEntryList, CacheEntry<K, V> entry) {
-        cacheIndex.putEntry(entry.key, entry);
+    public void onPut(K key) {
         // prepend entry to tail
-        cacheEntryList.appendEntry(entry);
+        CacheKeyEntry<K> newEntry = new CacheKeyEntry<>(key);
+        cacheKeyList.appendKey(newEntry);
     }
 }
